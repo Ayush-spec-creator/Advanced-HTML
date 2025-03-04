@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A photo editing app with interactive tools to enhance your images with filters, brightness adjustments, and more.">
+    <title>PhotoEdit Pro - Interactive App</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .app-container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 80%;
+            max-width: 900px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .controls button, .controls input[type="range"], .controls input[type="file"] {
+            font-size: 1rem;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            background-color: #ff6a00;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .controls button:hover, .controls input[type="range"]:hover {
+            background-color: #ff4b5c;
+        }
+
+        .controls input[type="file"] {
+            padding: 8px;
+        }
+
+        .slider-label {
+            font-size: 0.9rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .controls div {
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        footer a {
+            color: #ff6a00;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1>PhotoEdit Pro - Your Personal Photo Editor</h1>
+        </header>
+
+        <div class="canvas-container">
+            <canvas id="photoCanvas" width="800" height="600"></canvas>
+        </div>
+
+        <div class="controls">
+            <input type="file" id="uploadImage" accept="image/*">
+            <button id="saveImage">Save Image</button>
+        </div>
+
+        <div class="controls">
+            <div>
+                <label class="slider-label" for="brightness">Brightness</label>
+                <input type="range" id="brightness" min="-100" max="100" value="0">
+            </div>
+            <div>
+                <label class="slider-label" for="contrast">Contrast</label>
+                <input type="range" id="contrast" min="-100" max="100" value="0">
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 PhotoEdit Pro. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script>
+        const uploadInput = document.getElementById("uploadImage");
+        const saveButton = document.getElementById("saveImage");
+        const brightnessSlider = document.getElementById("brightness");
+        const contrastSlider = document.getElementById("contrast");
+        const canvas = document.getElementById("photoCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let image = new Image();
+
+        // Function to handle image upload
+        uploadInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                image.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Draw the image on the canvas when it's loaded
+        image.onload = function () {
+            canvas.width = image.width;
+            canvas.height = image.height;
+            ctx.drawImage(image, 0, 0);
+        };
+
+        // Update image adjustments on slider change
+        brightnessSlider.addEventListener("input", applyChanges);
+        contrastSlider.addEventListener("input", applyChanges);
+
+        function applyChanges() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.filter = `brightness(${100 + parseInt(brightnessSlider.value)}%) contrast(${100 + parseInt(contrastSlider.value)}%)`;
+            ctx.drawImage(image, 0, 0);
+        }
+
+        // Save the edited image
+        saveButton.addEventListener("click", () => {
+            const dataUrl = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = dataUrl;
+            link.download = "edited-photo.png";
+            link.click();
+        });
+    </script>
+
+</body>
+</html>
